@@ -1,61 +1,75 @@
 <?php
-session_start();
 header('Content-Type: application/json');
+include "db.php";
 
-if (!isset($_SESSION['history'])) {
-    $_SESSION['history'] = [];
+$student = $_POST['student'];
+$semester = $_POST['semester'];
+
+$courses = $_POST['course'];
+$credits = $_POST['credits'];
+$grades = $_POST['grade'];
+
+$totalPoints = 0;
+$totalCredits = 0;
+
+$tableHtml = "<table class='table table-bordered mt-3'>";
+$tableHtml .= "<tr>
+<th>Course</th>
+<th>Credits</th>
+<th>Grade</th>
+<th>Points</th>
+</tr>";
+
+for($i=0;$i<count($courses);$i++){
+
+$course = htmlspecialchars($courses[$i]);
+$cr = floatval($credits[$i]);
+$g = floatval($grades[$i]);
+
+$pts = $cr * $g;
+
+$totalPoints += $pts;
+$totalCredits += $cr;
+
+$tableHtml .= "<tr>
+<td>$course</td>
+<td>$cr</td>
+<td>$g</td>
+<td>$pts</td>
+</tr>";
+
 }
 
-if (isset($_POST['course'], $_POST['credits'], $_POST['grade'])) {
+$tableHtml .= "</table>";
 
-    $student = $_POST['student_name'];
-    $semester = $_POST['semester'];
+$gpa = $totalPoints/$totalCredits;
 
-    $courses = $_POST['course'];
-    $credits = $_POST['credits'];
-    $grades  = $_POST['grade'];
+for($i=0;$i<count($courses);$i++){
 
-    $totalPoints = 0;
-    $totalCredits = 0;
+$sql="INSERT INTO gpa_results
+(student_name,semester,course,credits,grade,gpa)
+VALUES (?,?,?,?,?,?)";
 
-    for ($i = 0; $i < count($courses); $i++) {
+$stmt=$conn->prepare($sql);
 
-        $cr = floatval($credits[$i]);
-        $g  = floatval($grades[$i]);
+$stmt->bind_param(
+"sssddd",
+$student,
+$semester,
+$courses[$i],
+$credits[$i],
+$grades[$i],
+$gpa
+);
 
-        if ($cr <= 0) continue;
-
-        $totalPoints += $cr * $g;
-        $totalCredits += $cr;
-    }
-
-    if ($totalCredits > 0) {
-
-        $gpa = $totalPoints / $totalCredits;
-
-        $_SESSION['history'][] = [
-            'student' => $student,
-            'semester' => $semester,
-            'gpa' => round($gpa, 2),
-            'time' => date('Y-m-d H:i:s')
-        ];
-
-        echo json_encode([
-            'success' => true,
-            'gpa' => $gpa,
-            'history' => $_SESSION['history']
-        ]);
-
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid input'
-        ]);
-    }
-
-} else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Data not received'
-    ]);
+$stmt->execute();
 }
+
+echo json_encode([
+"success"=>true,
+"gpa"=>$gpa,
+"message"=>"GPA = ".number_format($gpa,2),
+"tableHtml"=>$tableHtml
+]);
+?>
+     
