@@ -1,47 +1,73 @@
-$(document).ready(function () {
+$(document).ready(function(){
 
-    // Add course
-    $('#addCourse').click(function () {
-        let row = $('.course-row').first().clone();
-        row.find('input').val('');
-        $('#courses').append(row);
-    });
+$('#addCourse').click(function(){
 
-    // Submit form
-    $('#gpaForm').submit(function (e) {
-        e.preventDefault();
+var row = $('.course-row').first().clone();
+row.find('input').val('');
+$('#courses').append(row);
 
-        $.ajax({
-            url: 'calculate.php',
-            type: 'POST',
-            data: $(this).serialize(),
-            dataType: 'json',
+});
 
-            success: function (response) {
+$('#gpaForm').submit(function(e){
 
-                if (response.success) {
+e.preventDefault();
 
-                    let html = `<h3>GPA: ${response.gpa.toFixed(2)}</h3>`;
+$.ajax({
 
-                    html += `<h4>History</h4><ul>`;
+url:"calculate.php",
+type:"POST",
+data:$(this).serialize(),
+dataType:"json",
 
-                    response.history.forEach(item => {
-                        html += `<li>
-                            ${item.student} | ${item.semester}
-                            → GPA: ${item.gpa}
-                            (${item.time})
-                        </li>`;
-                    });
+success:function(response){
 
-                    html += `</ul>`;
+if(response.success){
 
-                    $('#result').html(html);
+var gpa = parseFloat(response.gpa);
 
-                } else {
-                    $('#result').html(`<p>${response.message}</p>`);
-                }
-            }
-        });
-    });
+$('#result').removeClass("pass fail");
+
+if(gpa >= 2){
+$('#result').addClass("pass");
+$('#result').html("✅ Passed - GPA = " + gpa.toFixed(2));
+}else{
+$('#result').addClass("fail");
+$('#result').html("❌ Failed - GPA = " + gpa.toFixed(2));
+}
+
+$('#result').append(response.tableHtml);
+
+var percent = (gpa/4)*100;
+
+$('#gpaBar').css('width',percent+"%");
+
+$('#gpaBar').removeClass(
+'bg-success bg-info bg-warning bg-danger'
+);
+
+if(gpa >=3.7){
+$('#gpaBar').addClass('bg-success');
+}
+else if(gpa >=3){
+$('#gpaBar').addClass('bg-info');
+}
+else if(gpa >=2){
+$('#gpaBar').addClass('bg-warning');
+}
+else{
+$('#gpaBar').addClass('bg-danger');
+}
+
+}
+
+}
+
+});
+
+});
+
+$('#exportCSV').click(function(){
+window.location="export.php";
+});
 
 });
