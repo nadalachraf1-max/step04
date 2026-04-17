@@ -1,40 +1,29 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #e9ecef;
+body{
+background: linear-gradient(135deg,#74ebd5,#ACB6E5);
+min-height:100vh;
 }
 
-h1 {
-    color: #007BFF;
+.card{
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
-.course-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
+#result{
+font-size:22px;
+font-weight:bold;
+text-align:center;
+padding:10px;
+border-radius:10px;
+margin-top:15px;
 }
 
-.course-row input,
-.course-row select {
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.pass{
+background:#d4edda;
+color:#155724;
 }
 
-table {
-    border-collapse: collapse;
-    margin-top: 16px;
+.fail{
+background:#f8d7da;
+color:#721c24;
 }
 
-table th,
-table td {
-    border: 1px solid #ccc;
-    padding: 8px 14px;
-    text-align: center;
-}
-
-table th {
-    background-color: #007BFF;
-    color: white;
-}
