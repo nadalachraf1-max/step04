@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Author</title>
+</head>
+<body>
+
+<form method="GET" action="">
+    <label>Enter author name:</label>
+    <input type="text" name="author">
+    <button type="submit">Search</button>
+</form>
+
+<?php
+if (isset($_GET['author']) && !empty(trim($_GET['author']))) {
+    $author = htmlspecialchars($_GET['author']);
+    echo "<p>🔎 You searched for author: <strong>$author</strong></p>";
+} else if (isset($_GET['author'])) {
+    echo "<p style='color:red;'>⚠️ Error: Please enter an author name.</p>";
+}
+?>
+
+</body>
+</html>
